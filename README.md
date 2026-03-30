@@ -126,7 +126,7 @@ npm run dev              # http://localhost:5173
 | Role | Scope |
 |---|---|
 | **API Backend** (Fayssal) | Laravel API, auth, Claude integration, credits, export |
-| **Web Frontend** (Binôme) | React app, UI components, SSE streaming, preview |
+| **Web Frontend** (maroua) | React app, UI components, SSE streaming, preview |
 
 ## 📄 License
 
