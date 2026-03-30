@@ -1,0 +1,32 @@
+{
+    "intelephense.environment.phpVersion": "8.3.0",
+    "intelephense.files.exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/vendor/**",
+        "**/bower_components/**",
+        "**/.history/**",
+        "**/vendor/**/Test*/**",
+        "**/vendor/**/test*/**",
+        "**/vendor/**/Test/**",
+        "**/vendor/**/tests/**"
+    ],
+    "intelephense.diagnostics.undefinedTypes": false,
+    "intelephense.diagnostics.undefinedFunctions": false,
+    "intelephense.diagnostics.undefinedConstants": false,
+    "intelephense.diagnostics.undefinedClassConstants": false,
+    "intelephense.diagnostics.undefinedMethods": false,
+    "intelephense.diagnostics.undefinedProperties": false,
+    "intelephense.diagnostics.undefinedVariables": false,
+    "php.validate.enable": false,
+    "files.watcherExclude": {
+        "**/vendor/**": true,
+        "**/node_modules/**": true,
+        "**/tmp-api/**": true
+    },
+    "search.exclude": {
+        "**/vendor": true,
+        "**/node_modules": true,
+        "**/tmp-api": true
+    }
+}
