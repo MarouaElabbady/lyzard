@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         
         $middleware->alias([
             'supabase.auth' => \App\Http\Middleware\SupabaseAuth::class,
+            'check.credits' => \App\Http\Middleware\CheckCredits::class,
         ]);
 
         $middleware->api(prepend: [
