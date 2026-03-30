@@ -148,15 +148,14 @@ Sprint 4 (S7-S8) ── Export + Landing    ── Go-to-market
 
 ## Git Branching — Par Repo
 
-Chaque repo suit le même modèle :
+Chaque repo suit le modèle GitHub Flow (directement sur main) :
 
-```
-main          ← Production stable
-  └── develop ← Integration
-       ├── feature/auth-register
-       ├── feature/claude-streaming
-       ├── feature/project-crud
-       └── fix/credit-deduction
+```text
+main          ← Production / Intégration continue
+  ├── feature/auth-register
+  ├── feature/claude-streaming
+  ├── feature/project-crud
+  └── fix/credit-deduction
 ```
 
 ### Conventions de Commit
