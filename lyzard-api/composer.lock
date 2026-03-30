@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "4b477603df564150c2ab95a2a0a3cc4a",
+=======
+    "content-hash": "c57754c93ae34ac3b9b716a0fd2f2149",
+>>>>>>> origin/main
     "packages": [
         {
             "name": "brick/math",
@@ -509,6 +513,7 @@
             "time": "2025-03-06T22:45:56+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "firebase/php-jwt",
             "version": "v7.0.4",
             "source": {
@@ -573,6 +578,8 @@
             "time": "2026-03-27T21:17:19+00:00"
         },
         {
+=======
+>>>>>>> origin/main
             "name": "fruitcake/php-cors",
             "version": "v1.4.0",
             "source": {
