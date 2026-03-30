@@ -1,0 +1,39 @@
+# Root monorepo gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.fleet/
+.nova/
+.zed/
+
+# Temporary build folders from tmp operations
+tmp-api/
+tmp-web/
+
+# lyzard-api (Laravel)
+lyzard-api/vendor/
+lyzard-api/node_modules/
+lyzard-api/.env
+lyzard-api/.env.backup
+lyzard-api/.env.production
+lyzard-api/storage/pail/
+lyzard-api/storage/*.key
+lyzard-api/public/build/
+lyzard-api/public/hot/
+lyzard-api/public/storage/
+lyzard-api/.phpunit.result.cache
+lyzard-api/.phpunit.cache/
+lyzard-api/auth.json
+
+# lyzard-web (Vite/React)
+lyzard-web/node_modules/
+lyzard-web/dist/
+lyzard-web/.env.local
+lyzard-web/.env.production.local
+
+# Composer phar (large binary)
+composer.phar
