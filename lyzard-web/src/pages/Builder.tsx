@@ -3,6 +3,7 @@ import { useSSEStream } from '../hooks/useSSEStream';
 import { ChatPanel } from '../components/Builder/ChatPanel';
 import { PreviewIframe } from '../components/Builder/PreviewIframe';
 import { Smartphone, Tablet, Monitor, Wand2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -14,14 +15,15 @@ export default function Builder() {
   const [device, setDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   const { isStreaming, streamedCode, startStream } = useSSEStream();
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     const userMessage: Message = { role: 'user', content };
     setMessages((prev) => [...prev, userMessage]);
 
-    // Build the SSE URL with query params for the GET request
-    // Note: Use the token from localStorage for auth
-    const token = localStorage.getItem('supabase_jwt');
-    const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/generate?prompt=${encodeURIComponent(content)}&token=${token}`;
+    // Get live Supabase session token (SSE can't set headers, so pass as query param)
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token ?? '';
+    const base = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
+    const apiUrl = `${base}/v1/generate?prompt=${encodeURIComponent(content)}&token=${encodeURIComponent(token)}`;
 
     startStream(apiUrl, {
       onDone: () => {
