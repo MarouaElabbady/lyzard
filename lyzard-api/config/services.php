@@ -40,4 +40,11 @@ return [
         'model' => env('ANTHROPIC_MODEL', 'claude-3-7-sonnet-20250219'),
     ],
 
+    'supabase' => [
+        'url'         => env('SUPABASE_URL'),
+        'anon_key'    => env('SUPABASE_ANON_KEY'),
+        'service_key' => env('SUPABASE_SERVICE_KEY'),
+        'jwt_secret'  => env('SUPABASE_JWT_SECRET'),
+    ],
+
 ];
