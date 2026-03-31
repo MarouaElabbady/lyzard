@@ -14,14 +14,16 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->append(\App\Http\Middleware\XssSanitizer::class);
-        
+
         $middleware->alias([
-            'supabase.auth' => \App\Http\Middleware\SupabaseAuth::class,
-            'check.credits' => \App\Http\Middleware\CheckCredits::class,
+            'supabase.auth'  => \App\Http\Middleware\SupabaseAuth::class,
+            'check.credits'  => \App\Http\Middleware\CheckCredits::class,
+            'force.json'     => \App\Http\Middleware\ForceJsonResponse::class,
         ]);
 
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
+            \App\Http\Middleware\ForceJsonResponse::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
