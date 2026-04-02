@@ -39,6 +39,8 @@ Route::prefix('v1')->group(function () {
 
         // Projects & Jobs
         Route::apiResource('projects', ProjectController::class);
+        Route::get('/projects/{project}/versions', [ProjectController::class, 'versions'])->name('projects.versions.index');
+        Route::post('/projects/{project}/versions', [ProjectController::class, 'storeVersion'])->name('projects.versions.store');
         Route::put('/projects/{project}/jobs/{job}', [\App\Http\Controllers\Api\JobController::class, 'update'])
             ->name('jobs.update');
     });

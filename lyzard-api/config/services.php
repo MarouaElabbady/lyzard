@@ -40,6 +40,12 @@ return [
         'model' => env('ANTHROPIC_MODEL', 'claude-3-7-sonnet-20250219'),
     ],
 
+    'nvidia' => [
+        'key' => env('NVIDIA_API_KEY'),
+        'url' => env('NVIDIA_API_URL', 'https://integrate.api.nvidia.com/v1'),
+        'model' => env('NVIDIA_MODEL', 'deepseek-ai/deepseek-v3.2'),
+    ],
+
     'supabase' => [
         'url'         => env('SUPABASE_URL'),
         'anon_key'    => env('SUPABASE_ANON_KEY'),

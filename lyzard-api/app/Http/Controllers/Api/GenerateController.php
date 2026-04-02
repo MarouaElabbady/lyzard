@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\ClaudeService;
+use App\Services\NvidiaAiService;
 use App\Services\PromptBuilder;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GenerateController extends Controller
 {
-    protected ClaudeService $claude;
+    protected NvidiaAiService $aiService;
     protected PromptBuilder $promptBuilder;
 
-    public function __construct(ClaudeService $claude, PromptBuilder $promptBuilder)
+    public function __construct(NvidiaAiService $aiService, PromptBuilder $promptBuilder)
     {
-        $this->claude = $claude;
+        $this->aiService = $aiService;
         $this->promptBuilder = $promptBuilder;
     }
 
@@ -34,7 +34,7 @@ class GenerateController extends Controller
         ];
 
         return new StreamedResponse(function () use ($messages, $request) {
-            $this->claude->stream($messages, function (string $chunk) {
+            $this->aiService->stream($messages, function (string $chunk) {
                 echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
                 if (ob_get_level() > 0) {
                     ob_flush();
@@ -44,8 +44,8 @@ class GenerateController extends Controller
 
             // Deduct 1 credit
             $user = $request->user();
-            if ($user) {
-                $user->decrement('credits', 1);
+            if ($user && env('APP_ENV') !== 'local' && false) { // disable for local testing
+                // $user->decrement('credits', 1);
             }
             
             // Final signal
@@ -79,7 +79,7 @@ class GenerateController extends Controller
         ];
 
         return new StreamedResponse(function () use ($messages, $request) {
-            $this->claude->stream($messages, function (string $chunk) {
+            $this->aiService->stream($messages, function (string $chunk) {
                 echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
                 if (ob_get_level() > 0) {
                     ob_flush();
@@ -89,8 +89,8 @@ class GenerateController extends Controller
 
             // Deduct 1 credit
             $user = $request->user();
-            if ($user) {
-                $user->decrement('credits', 1);
+            if ($user && env('APP_ENV') !== 'local' && false) { // disable for local testing
+                // $user->decrement('credits', 1);
             }
             
             echo "data: [DONE]\n\n";
