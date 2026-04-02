@@ -31,8 +31,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/me',     [AuthController::class, 'me']);
         Route::post('/auth/sync',  [AuthController::class, 'sync']);
 
-        // AI Generation (requires credits)
-        Route::middleware('check.credits')->group(function () {
+        // AI Generation (requires credits and rate limits)
+        Route::middleware(['check.credits', 'throttle:5,1'])->group(function () {
             Route::get('/generate',           [\App\Http\Controllers\Api\GenerateController::class, 'generate']);
             Route::post('/generate/iterate',  [\App\Http\Controllers\Api\GenerateController::class, 'iterate']);
         });

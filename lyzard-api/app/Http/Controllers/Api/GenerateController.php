@@ -33,7 +33,12 @@ class GenerateController extends Controller
             ['role' => 'user', 'content' => $this->promptBuilder->buildUserPrompt($prompt)],
         ];
 
-        return new StreamedResponse(function () use ($messages, $request) {
+        $user = $request->user();
+        if ($user) {
+            $user->decrement('credits');
+        }
+
+        return new StreamedResponse(function () use ($messages) {
             $this->aiService->stream($messages, function (string $chunk) {
                 echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
                 if (ob_get_level() > 0) {
@@ -42,12 +47,6 @@ class GenerateController extends Controller
                 flush();
             });
 
-            // Deduct 1 credit
-            $user = $request->user();
-            if ($user && env('APP_ENV') !== 'local' && false) { // disable for local testing
-                // $user->decrement('credits', 1);
-            }
-            
             // Final signal
             echo "data: [DONE]\n\n";
             if (ob_get_level() > 0) {
@@ -78,7 +77,12 @@ class GenerateController extends Controller
             )],
         ];
 
-        return new StreamedResponse(function () use ($messages, $request) {
+        $user = $request->user();
+        if ($user) {
+            $user->decrement('credits');
+        }
+
+        return new StreamedResponse(function () use ($messages) {
             $this->aiService->stream($messages, function (string $chunk) {
                 echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
                 if (ob_get_level() > 0) {
@@ -87,12 +91,6 @@ class GenerateController extends Controller
                 flush();
             });
 
-            // Deduct 1 credit
-            $user = $request->user();
-            if ($user && env('APP_ENV') !== 'local' && false) { // disable for local testing
-                // $user->decrement('credits', 1);
-            }
-            
             echo "data: [DONE]\n\n";
             if (ob_get_level() > 0) {
                 ob_flush();
