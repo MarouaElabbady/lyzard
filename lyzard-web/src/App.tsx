@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Session } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -35,17 +35,14 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Restore session from storage on first render
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    // Listen to all future auth changes (login, logout, token refresh)
+    // onAuthStateChange fires INITIAL_SESSION on mount — use it as
+    // the single source of truth so we avoid the getSession race.
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[Auth]', event, session?.user?.email ?? 'null');
       setSession(session);
+      setLoading(false); // clears loading on INITIAL_SESSION and all future events
     });
 
     return () => subscription.unsubscribe();
@@ -54,9 +51,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public */}
-        <Route path="/login"  element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        {/* Public — redirect to dashboard if already logged in */}
+        <Route path="/login"  element={!loading && session ? <Navigate to="/dashboard" replace /> : <Login />} />
+        <Route path="/signup" element={!loading && session ? <Navigate to="/dashboard" replace /> : <Signup />} />
 
         {/* Protected */}
         <Route

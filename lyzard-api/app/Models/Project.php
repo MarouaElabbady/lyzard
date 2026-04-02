@@ -26,4 +26,9 @@ class Project extends Model
     {
         return $this->hasMany(Job::class);
     }
+
+    public function versions(): HasMany
+    {
+        return $this->hasMany(ProjectVersion::class);
+    }
 }
