@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Builder from './pages/Builder';
+import Settings from './pages/Settings';
 
 // ── Protected Route ──────────────────────────────────────────────────────────
 // Reads the live Supabase session — never the old localStorage key.
@@ -69,6 +70,14 @@ function App() {
           element={
             <ProtectedRoute session={session} loading={loading}>
               <Builder />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute session={session} loading={loading}>
+              <Settings />
             </ProtectedRoute>
           }
         />

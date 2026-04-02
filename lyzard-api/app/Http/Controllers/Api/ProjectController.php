@@ -62,7 +62,31 @@ class ProjectController extends Controller
     {
         $this->authorizeAccess($project);
 
-        return response()->json($project->versions()->paginate(10));
+        return response()->json($project->versions()->latest()->paginate(10));
+    }
+
+    /**
+     * Store a new version for a project.
+     */
+    public function storeVersion(Request $request, Project $project): JsonResponse
+    {
+        $this->authorizeAccess($project);
+
+        $request->validate([
+            'content' => 'required|string',
+            'prompt' => 'nullable|string',
+        ]);
+
+        $version = $project->versions()->create([
+            'content' => $request->input('content'),
+            'prompt' => $request->input('prompt'),
+        ]);
+
+        if ($project->status === 'pending') {
+            $project->update(['status' => 'active']);
+        }
+
+        return response()->json($version, 201);
     }
 
     /**
