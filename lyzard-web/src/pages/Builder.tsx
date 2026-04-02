@@ -3,10 +3,10 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useSSEStream } from '../hooks/useSSEStream';
 import { ChatPanel } from '../components/Builder/ChatPanel';
 import { PreviewIframe } from '../components/Builder/PreviewIframe';
-import { Smartphone, Tablet, Monitor, Wand2, ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
+import { Smartphone, Tablet, Monitor, Wand2, ArrowLeft, Loader2, CheckCircle, History } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { getProject, saveProjectVersion } from '../api/projects';
-import type { ProjectWithVersions } from '../api/projects';
+import { getProject, saveProjectVersion, getProjectVersions } from '../api/projects';
+import type { ProjectWithVersions, ProjectVersion } from '../api/projects';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -24,9 +24,9 @@ export default function Builder() {
   const [loadingProject, setLoadingProject] = useState(!!projectId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [device, setDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-  const [currentPrompt, setCurrentPrompt] = useState('');
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [initialCode, setInitialCode] = useState('');
+  const [versions, setVersions] = useState<ProjectVersion[]>([]);
 
   const { isStreaming, streamedCode, startStream } = useSSEStream();
 
@@ -35,17 +35,20 @@ export default function Builder() {
     if (!projectId) return;
 
     setLoadingProject(true);
-    getProject(projectId)
-      .then((p) => {
+    Promise.all([
+      getProject(projectId),
+      getProjectVersions(projectId)
+    ])
+      .then(([p, vRes]) => {
         setProject(p);
+        setVersions(vRes.data);
         // Load the latest version's code into the preview if it exists
-        const latestVersion = p.versions?.[0];
-        if (latestVersion?.content) {
-          setInitialCode(latestVersion.content);
+        if (vRes.data.length > 0 && vRes.data[0].content) {
+          setInitialCode(vRes.data[0].content);
         }
       })
       .catch((err) => {
-        console.error('Failed to load project:', err);
+        console.error('Failed to load project or versions:', err);
       })
       .finally(() => setLoadingProject(false));
   }, [projectId]);
@@ -55,7 +58,8 @@ export default function Builder() {
     if (!projectId || !code) return;
     setSaveState('saving');
     try {
-      await saveProjectVersion(projectId, code, prompt);
+      const newVersion = await saveProjectVersion(projectId, code, prompt);
+      setVersions((prev) => [newVersion, ...prev]);
       setSaveState('saved');
       setTimeout(() => setSaveState('idle'), 3000);
     } catch (err) {
@@ -68,7 +72,6 @@ export default function Builder() {
   const handleSendMessage = async (content: string) => {
     const userMessage: Message = { role: 'user', content };
     setMessages((prev) => [...prev, userMessage]);
-    setCurrentPrompt(content);
 
     const { data: { session } } = await supabase.auth.getSession();
     const token = session?.access_token ?? '';
@@ -142,8 +145,29 @@ export default function Builder() {
           ))}
         </div>
 
-        {/* Right: save indicator */}
-        <div className="flex items-center gap-2 text-xs text-neutral-500">
+        {/* Right: History & Save indicator */}
+        <div className="flex items-center gap-4 text-xs text-neutral-500">
+          {versions.length > 0 && (
+            <div className="flex items-center gap-2">
+              <History className="w-3.5 h-3.5 text-neutral-400" />
+              <select
+                className="bg-neutral-900 text-neutral-300 px-2 py-1 rounded border border-neutral-700 outline-none hover:border-neutral-600 transition-colors"
+                onChange={(e) => {
+                  const v = versions.find(ver => ver.id === e.target.value);
+                  if (v) setInitialCode(v.content);
+                }}
+                defaultValue={versions[0]?.id}
+              >
+                <option value="" disabled>Version history</option>
+                {versions.map((v, i) => (
+                  <option key={v.id} value={v.id}>
+                    Version {versions.length - i} {v.prompt ? `(${v.prompt.substring(0, 15)}...)` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {saveState === 'saving' && (
             <>
               <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-400" />

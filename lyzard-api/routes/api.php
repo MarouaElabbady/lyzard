@@ -37,6 +37,10 @@ Route::prefix('v1')->group(function () {
             Route::post('/generate/iterate',  [\App\Http\Controllers\Api\GenerateController::class, 'iterate']);
         });
 
+        // Credits
+        Route::get('/credits', [\App\Http\Controllers\Api\CreditController::class, 'index']);
+        Route::post('/credits/purchase', [\App\Http\Controllers\Api\CreditController::class, 'purchase']);
+
         // Projects & Jobs
         Route::apiResource('projects', ProjectController::class);
         Route::get('/projects/{project}/versions', [ProjectController::class, 'versions'])->name('projects.versions.index');

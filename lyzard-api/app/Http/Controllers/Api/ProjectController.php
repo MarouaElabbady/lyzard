@@ -62,7 +62,7 @@ class ProjectController extends Controller
     {
         $this->authorizeAccess($project);
 
-        return response()->json($project->versions()->paginate(10));
+        return response()->json($project->versions()->latest()->paginate(10));
     }
 
     /**
