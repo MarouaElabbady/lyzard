@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProjectController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +38,7 @@ Route::prefix('v1')->group(function () {
         });
 
         // Projects & Jobs
+        Route::apiResource('projects', ProjectController::class);
         Route::put('/projects/{project}/jobs/{job}', [\App\Http\Controllers\Api\JobController::class, 'update'])
             ->name('jobs.update');
     });

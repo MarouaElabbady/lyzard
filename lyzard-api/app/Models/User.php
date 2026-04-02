@@ -31,4 +31,9 @@ class User extends Authenticatable
             'credits' => 'integer',
         ];
     }
+
+    public function projects(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Project::class);
+    }
 }

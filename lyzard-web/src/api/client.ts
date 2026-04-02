@@ -26,16 +26,13 @@ apiClient.interceptors.request.use(async (config) => {
   return config;
 });
 
-// ── Handle 401 globally — sign out and redirect ───────────────────────────
+// ── Handle response errors — do NOT auto-sign-out on 401 ─────────────────
+// A 401 from the Laravel backend means the backend rejected the token,
+// but that doesn't mean the Supabase session is invalid. Let each page
+// decide how to handle the error (show a message, retry, etc.).
 apiClient.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      await supabase.auth.signOut();
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default apiClient;
