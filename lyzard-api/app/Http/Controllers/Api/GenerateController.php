@@ -24,13 +24,16 @@ class GenerateController extends Controller
      */
     public function generate(Request $request): StreamedResponse
     {
+        set_time_limit(0);
         $request->validate([
             'prompt' => 'required|string|min:3',
         ]);
 
-        $prompt = $request->input('prompt');
+        $rawPrompt = $request->input('prompt');
+        $upgradedPrompt = $this->aiService->upgradePrompt($rawPrompt);
+
         $messages = [
-            ['role' => 'user', 'content' => $this->promptBuilder->buildUserPrompt($prompt)],
+            ['role' => 'user', 'content' => $this->promptBuilder->buildUserPrompt($upgradedPrompt)],
         ];
 
         $user = $request->user();
@@ -39,20 +42,29 @@ class GenerateController extends Controller
         }
 
         return new StreamedResponse(function () use ($messages) {
-            $this->aiService->stream($messages, function (string $chunk) {
-                echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
+            try {
+                $this->aiService->stream($messages, function (string $chunk) {
+                    echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
+                    if (ob_get_level() > 0) {
+                        ob_flush();
+                    }
+                    flush();
+                });
+
+                // Final signal
+                echo "data: [DONE]\n\n";
                 if (ob_get_level() > 0) {
                     ob_flush();
                 }
                 flush();
-            });
-
-            // Final signal
-            echo "data: [DONE]\n\n";
-            if (ob_get_level() > 0) {
-                ob_flush();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Generation Stream Error', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                echo "data: " . json_encode(['error' => $e->getMessage()]) . "\n\n";
+                echo "data: [DONE]\n\n";
             }
-            flush();
         }, 200, [
             'Cache-Control' => 'no-cache',
             'Content-Type' => 'text/event-stream',
@@ -65,6 +77,7 @@ class GenerateController extends Controller
      */
     public function iterate(Request $request): StreamedResponse
     {
+        set_time_limit(0);
         $request->validate([
             'previous_code' => 'required|string',
             'changes' => 'required|string',

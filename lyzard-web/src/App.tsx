@@ -7,6 +7,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Builder from './pages/Builder';
 import Settings from './pages/Settings';
+import Landing from './pages/Landing';
 
 // ── Protected Route ──────────────────────────────────────────────────────────
 // Reads the live Supabase session — never the old localStorage key.
@@ -82,8 +83,8 @@ function App() {
           }
         />
 
-        {/* Default */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Public Landing */}
+        <Route path="/" element={!loading && session ? <Navigate to="/dashboard" replace /> : <Landing />} />
       </Routes>
     </Router>
   );

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /builder/
+Disallow: /settings/
+
+Sitemap: https://lyzard.ai/sitemap.xml

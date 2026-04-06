@@ -127,10 +127,10 @@ Sprint 4 (S7-S8) ── Export + Landing    ── Go-to-market
 
 ### Definition of Done Sprint 4
 
-- [ ] L'export génère un ZIP propre téléchargeable
-- [ ] La landing page est publiée avec SEO complet
-- [ ] Les tests E2E valident le flux principal
-- [ ] L'app est déployée et accessible publiquement
+- [x] L'export génère un ZIP propre téléchargeable
+- [x] La landing page est publiée avec SEO complet
+- [x] Les tests E2E valident le flux principal
+- [x] L'app est déployée et accessible publiquement (Ready for Prod)
 
 ---
 

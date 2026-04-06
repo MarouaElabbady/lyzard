@@ -22,6 +22,52 @@ class NvidiaAiService
     }
 
     /**
+     * Synthesize and upgrade the user prompt into a high-end designer specification.
+     */
+    public function upgradePrompt(string $userPrompt): string
+    {
+        $url = rtrim($this->baseUrl, '/') . '/chat/completions';
+
+        $systemPrompt = <<<EOT
+You are a world-class Web Designer & UX Architect. The user will provide a simple request for a landing page.
+Your task is to expand their request into a HIGHLY DETAILED technical and visual specification for a modern HTML/Tailwind landing page.
+
+SPECIFICATION PROTOCOLS:
+1. **FULL-STACK BUNDLE**: Explicitly command the code generator to deliver a Single, self-sufficient HTML file containing all HTML, CSS, and JS (no external files/assets except CDNs).
+2. **MODERN UI**: Specify modern UI trends like glassmorphism, 60fps animations, glowing gradients, clean sans-serif typography, large hero sections, bento-box grids, and high-contrast dark/light themes. 
+3. **ONLY THE PROMPT**: DO NOT write the code. ONLY write the detailed expanded prompt that will be passed to a code generator.
+The resulting prompt should be so descriptive that it guarantees a $10,000-tier design outcome.
+EOT;
+
+        $body = [
+            'model' => $this->model,
+            'messages' => [
+                ['role' => 'system', 'content' => $systemPrompt],
+                ['role' => 'user', 'content' => "Upgrade this prompt: " . $userPrompt],
+            ],
+            'max_tokens' => 1000,
+            'temperature' => 0.5,
+            'stream' => false,
+        ];
+
+        try {
+            $request = new Request('POST', $url, [
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ], json_encode($body));
+
+            $response = $this->client->send($request, ['timeout' => 30]);
+            $json = json_decode($response->getBody()->getContents(), true);
+
+            return $json['choices'][0]['message']['content'] ?? $userPrompt;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Nvidia AI Prompt Upgrade Failed', ['error' => $e->getMessage()]);
+            // Fallback to original prompt if upgrade fails
+            return $userPrompt;
+        }
+    }
+
+    /**
      * Stream a response from Nvidia API (OpenAI compatible format).
      */
     public function stream(array $messages, callable $onChunk): void
@@ -55,9 +101,19 @@ class NvidiaAiService
             'Accept' => 'text/event-stream',
         ], json_encode($body));
 
-        $response = $this->client->send($request, [
-            'stream' => true,
-        ]);
+        try {
+            $response = $this->client->send($request, [
+                'stream' => true,
+                'connect_timeout' => 10,
+                'timeout' => 300, // 5 minutes for full generation
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Nvidia AI API Connection Failed', [
+                'error' => $e->getMessage(),
+                'url' => $url,
+            ]);
+            throw $e;
+        }
 
         $this->processStream($response, $onChunk);
     }

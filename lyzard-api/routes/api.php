@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\ExportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,6 +46,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('projects', ProjectController::class);
         Route::get('/projects/{project}/versions', [ProjectController::class, 'versions'])->name('projects.versions.index');
         Route::post('/projects/{project}/versions', [ProjectController::class, 'storeVersion'])->name('projects.versions.store');
+        Route::post('/projects/{project}/export', [ExportController::class, 'export'])->name('projects.export');
         Route::put('/projects/{project}/jobs/{job}', [\App\Http\Controllers\Api\JobController::class, 'update'])
             ->name('jobs.update');
     });
